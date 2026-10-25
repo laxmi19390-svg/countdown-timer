@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Time Remaining — Countdown Wallpaper</title>
+<style>
+  :root {
+    --bg: #191919;
+    --tile-top: #343434;
+    --tile-bottom: #202020;
+    --white: #ededed;
+    --muted: #777;
+    --accent: #ef171d;
+  }
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% 48%, rgba(88,88,88,.38) 0%, rgba(48,48,48,.24) 30%, rgba(20,20,20,0) 67%),
+      radial-gradient(ellipse at 50% 52%, #292929 0%, #202020 47%, #171717 100%);
+    color: var(--white);
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  }
+  .wallpaper {
+    width: 100vw; height: 100vh; min-height: 420px;
+    position: relative; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 3.5vh 2.2vw 4vh;
+  }
+  h1 {
+    position: absolute; top: 4.3%; left: 0; width: 100%; margin: 0;
+    text-align: center; font-weight: 300; letter-spacing: .14em;
+    font-size: clamp(24px, 3.5vw, 58px); color: #f4f4f4;
+    text-shadow: 0 0 10px rgba(255,255,255,.08);
+  }
+  .clock {
+    width: 100%; max-width: 1600px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: clamp(8px, 1.1vw, 20px); align-items: center;
+    transform: translateY(-1.5vh);
+  }
+  .unit { min-width: 0; }
+  .pair { display: flex; gap: clamp(5px, .75vw, 12px); width: 100%; }
+  .digit {
+    position: relative; flex: 1; min-width: 0; height: clamp(112px, 15.3vw, 245px);
+    border: 1px solid #4a4a4a; border-radius: clamp(10px, 1.2vw, 19px);
+    background: linear-gradient(180deg, #363636 0%, #2d2d2d 47%, #202020 51%, #1d1d1d 100%);
+    box-shadow:
+      0 8px 12px rgba(0,0,0,.48),
+      0 0 13px rgba(255,255,255,.035),
+      inset 0 1px 1px rgba(255,255,255,.12),
+      inset 0 -10px 16px rgba(0,0,0,.16);
+    overflow: hidden;
+  }
+  /* The reference has one thin dark split line across the whole row. */
+  .clock { position: relative; }
+  .clock::after {
+    content: ""; position: absolute; z-index: 3;
+    left: -0.25%; right: -0.25%; top: 50%;
+    height: 2px; background: linear-gradient(180deg, #050505, #111);
+    box-shadow: 0 1px 0 rgba(255,255,255,.22), 0 0 4px rgba(0,0,0,.8);
+    pointer-events: none;
+  }
+  .digit::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+    background: rgba(0,0,0,.9); z-index: 3;
+  }
+  /* Separate metallic hinge caps at each tile's edges, not a silver stripe. */
+  .digit::after {
+    content: ""; position: absolute; top: calc(50% - 9px); left: -5px; right: -5px;
+    height: 18px; z-index: 4; pointer-events: none;
+    background:
+      linear-gradient(180deg, #777 0%, #e0e0e0 20%, #8b8b8b 45%, #292929 53%, #b8b8b8 76%, #555 100%);
+    border: 1px solid #111; border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 3px rgba(255,255,255,.12);
+    opacity: .96;
+    clip-path: polygon(0 0, 9% 0, 9% 100%, 0 100%, 0 0, 91% 0, 100% 0, 100% 100%, 91% 100%, 91% 0);
+    /* keep only the narrow metal tabs at the two ends */
+    mask: linear-gradient(90deg, #000 0 11%, transparent 11% 89%, #000 89% 100%);
+  }
+  .number {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: "Arial Narrow", "Segoe UI", Arial, sans-serif;
+    font-stretch: condensed; font-size: clamp(78px, 12.2vw, 190px);
+    line-height: 1; font-weight: 500; letter-spacing: -.065em;
+    color: #e8e8e8;
+    text-shadow: 0 0 1px rgba(255,255,255,.95), 0 0 5px rgba(255,255,255,.16), 0 2px 2px #111;
+    padding-right: .06em; z-index: 1;
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+  }
+  .number.flap {
+    animation: digit-flap .32s cubic-bezier(.2,.72,.25,1);
+  }
+  @keyframes digit-flap {
+    0%   { transform: perspective(420px) rotateX(0deg); filter: brightness(1); }
+    42%  { transform: perspective(420px) rotateX(-78deg); filter: brightness(.78); }
+    58%  { transform: perspective(420px) rotateX(68deg); filter: brightness(.88); }
+    100% { transform: perspective(420px) rotateX(0deg); filter: brightness(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .number.flap { animation: none; }
+  }
+  .digit.last-seconds .number {
+    color: #ed171d;
+    text-shadow: 0 0 2px rgba(255,35,40,.7), 0 0 8px rgba(255,0,0,.16), 0 2px 2px #111;
+  }
+  .labels {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    width: 100%; gap: clamp(8px, 1.1vw, 20px); margin-top: clamp(20px, 2.2vw, 35px);
+    color: var(--muted); text-align: center; text-transform: uppercase;
+    font-size: clamp(14px, 2.15vw, 36px); font-weight: 300;
+    letter-spacing: .025em;
+  }
+  .quote-area {
+    position: absolute; left: 6%; right: 6%; bottom: 5.4%;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    text-align: center; max-width: 1400px;
+  }
+  .quote {
+    font-size: clamp(15px, 1.55vw, 25px); font-weight: 300; line-height: 1.4;
+    color: #dedede; letter-spacing: .025em; max-width: 1100px;
+    opacity: 1; transition: opacity .45s ease;
+  }
+  .author {
+    color: #8c8c8c; font-size: clamp(12px, 1.05vw, 17px);
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .target {
+    position: absolute; bottom: 1.6%; right: 2%; color: #666;
+    font-size: clamp(9px, .75vw, 12px); letter-spacing: .08em;
+  }
+  @media (max-aspect-ratio: 5/4) {
+    .clock { gap: 8px; }
+    .digit { height: 17vw; }
+    .number { font-size: 12vw; }
+    .pair { gap: 5px; }
+    .quote-area { bottom: 4%; }
+  }
+  @media (max-height: 560px) {
+    h1 { top: 3%; }
+    .clock { transform: translateY(-2vh); }
+    .digit { height: 22vh; }
+    .number { font-size: 18vh; }
+    .labels { margin-top: 12px; }
+    .quote-area { bottom: 2.5%; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<main class="wallpaper">
+  <h1>TIME REMAINING</h1>
+  <section class="clock" aria-label="Countdown to January 25, 2027">
+    <div class="unit"><div class="pair"><div class="digit"><span class="number" id="daysTens">0</span></div><div class="digit"><span class="number" id="daysOnes">0</span></div></div></div>
+    <div class="unit"><div class="pair"><div class="digit"><span class="number" id="hoursTens">0</span></div><div class="digit"><span class="number" id="hoursOnes">0</span></div></div></div>
+    <div class="unit"><div class="pair"><div class="digit"><span class="number" id="minutesTens">0</span></div><div class="digit"><span class="number" id="minutesOnes">0</span></div></div></div>
+    <div class="unit"><div class="pair"><div class="digit"><span class="number" id="secondsTens">0</span></div><div class="digit last-seconds"><span class="number" id="secondsOnes">0</span></div></div></div>
+  </section>
+  <section class="labels" aria-hidden="true">
+    <div>DAYS</div><div>HOURS</div><div>MINUTES</div><div>SECONDS</div>
+  </section>
+  <section class="quote-area">
+    <div class="quote" id="quote">“It always seems impossible until it’s done.”</div>
+    <div class="author" id="author">— Nelson Mandela</div>
+  </section>
+  <div class="target">TARGET · 25 JAN 2027</div>
+</main>
+<script>
+(() => {
+  // Midnight at the start of January 25, 2027, India Standard Time (UTC+05:30).
+  const target = new Date("2027-01-25T00:00:00+05:30").getTime();
+  const ids = ["daysTens","daysOnes","hoursTens","hoursOnes","minutesTens","minutesOnes","secondsTens","secondsOnes"];
+  const quoteEl = document.getElementById("quote");
+  const authorEl = document.getElementById("author");
+
+  const quotes = [
+    ["It always seems impossible until it’s done.", "Nelson Mandela"],
+    ["Great things are done by a series of small things brought together.", "Vincent van Gogh"],
+    ["The secret of getting ahead is getting started.", "Mark Twain"],
+    ["It does not matter how slowly you go as long as you do not stop.", "Confucius"],
+    ["Believe you can and you’re halfway there.", "Theodore Roosevelt"],
+    ["The future depends on what you do today.", "Mahatma Gandhi"],
+    ["Well done is better than well said.", "Benjamin Franklin"],
+    ["You miss 100% of the shots you don’t take.", "Wayne Gretzky"],
+    ["Act as if what you do makes a difference. It does.", "William James"],
+    ["The only way to do great work is to love what you do.", "Steve Jobs"],
+    ["Start where you are. Use what you have. Do what you can.", "Arthur Ashe"],
+    ["Success is the sum of small efforts, repeated day in and day out.", "Robert Collier"],
+    ["Energy and persistence conquer all things.", "Benjamin Franklin"],
+    ["A journey of a thousand miles begins with a single step.", "Lao Tzu"],
+    ["Dream big and dare to fail.", "Norman Vaughan"],
+    ["If opportunity doesn’t knock, build a door.", "Milton Berle"],
+    ["Nothing will work unless you do.", "Maya Angelou"],
+    ["Quality is not an act, it is a habit.", "Will Durant"],
+    ["The best way out is always through.", "Robert Frost"],
+    ["Do what you can, with what you have, where you are.", "Theodore Roosevelt"],
+    ["Great minds discuss ideas; average minds discuss events; small minds discuss people.", "Eleanor Roosevelt"],
+    ["It’s never too late to be what you might have been.", "George Eliot"],
+    ["Well begun is half done.", "Aristotle"],
+    ["You are never too old to set another goal or to dream a new dream.", "C. S. Lewis"],
+    ["What we think, we become.", "Often attributed to Buddha"],
+    ["Difficulties strengthen the mind, as labor does the body.", "Seneca"],
+    ["Perseverance is not a long race; it is many short races one after another.", "Walter Elliot"],
+    ["The secret of success is to do the common thing uncommonly well.", "John D. Rockefeller Jr."],
+    ["Do not wait to strike till the iron is hot; make it hot by striking.", "William Butler Yeats"],
+    ["You have to expect things of yourself before you can do them.", "Michael Jordan"]
+  ];
+
+  // Animate a digit only when its displayed value changes.
+  function updateClock() {
+    let remaining = Math.max(0, target - Date.now());
+    const totalSeconds = Math.floor(remaining / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const values = [
+      Math.min(99, Math.floor(days / 10)), days % 10,
+      Math.floor(hours / 10), hours % 10,
+      Math.floor(minutes / 10), minutes % 10,
+      Math.floor(seconds / 10), seconds % 10
+    ];
+    ids.forEach((id, i) => {
+      const el = document.getElementById(id);
+      const next = String(values[i]);
+      if (el.textContent !== next) {
+        el.textContent = next;
+        el.classList.remove("flap");
+        // Restart the animation only on changed digits.
+        void el.offsetWidth;
+        el.classList.add("flap");
+      }
+    });
+    if (target <= Date.now()) {
+      document.querySelector("h1").textContent = "TIME IS NOW";
+    }
+  }
+
+  // Quotes remain completely steady and change once per minute, without blinking.
+  let lastQuoteMinute = null;
+  function updateQuote() {
+    const minuteIndex = Math.floor(Date.now() / 60000);
+    if (minuteIndex === lastQuoteMinute) return;
+    lastQuoteMinute = minuteIndex;
+    const item = quotes[((minuteIndex % quotes.length) + quotes.length) % quotes.length];
+    quoteEl.textContent = "“" + item[0] + "”";
+    authorEl.textContent = "— " + item[1];
+  }
+  updateClock();
+  updateQuote();
+  setInterval(updateClock, 250);
+  setInterval(updateQuote, 1000);
+})();
+</script>
+</body>
+</html>
